@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cerita Curhat</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/curhatstyle.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Sampaikan Curhatmu Apapun Itu</h1>
+    <form id="curhat-form">
+      <input type="file" id="foto" name="foto" accept="image/*" required />
+      <input type="text" id="lokasi" placeholder="Lokasi Foto" required />
+      <input type="text" id="nama" placeholder="Nama Lengkap" required />
+      <input type="text" id="nomer" placeholder="No HP yang sedang aktif" required />
+      <textarea id="keluhan" placeholder="Tulis keluhan" required></textarea>
+      <button type="submit">Kirim</button>
+    </form>
+
+    <p id="status"></p>
+  </div>
+
+  <script>
+    document.getElementById("curhat-form").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const fileInput = document.getElementById("foto");
+      const file = fileInput.files[0];
+      const reader = new FileReader();
+
+      reader.onload = function(event) {
+        const nama = document.getElementById("nama").value;
+        const lokasi = document.getElementById("lokasi").value;
+        const nomer = document.getElementById("nomer").value;
+        const keluhan = document.getElementById("keluhan").value;
+
+        const data = {
+          nama,
+          lokasi,
+          nomer,
+          keluhan,
+          foto: event.target.result, // base64 file
+          filename: file.name,
+          mimetype: file.type
+        };
+
+        fetch("https://script.google.com/macros/s/AKfycbwQyHkvCOA7qH18_r07XvtdttCxKlkqKmSuOsNMc_Xb_ykvtJk4HoFJBvCbdgqyY49l/exec", {
+          method: "POST",
+          body: JSON.stringify(data),
+          headers: {
+            "Content-Type": "application/json"
+          }
+        })
+        .then(response => response.text())
+        .then(result => {
+          document.getElementById("status").innerText = result;
+        })
+        .catch(error => {
+          document.getElementById("status").innerText = "Gagal: " + error;
+        });
+      };
+
+      reader.readAsDataURL(file);
+    });
+  </script>
+</body>
+</html>
